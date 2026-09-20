@@ -1,3 +1,4 @@
+
 def call() {
 
     pipeline {
@@ -17,7 +18,7 @@ def call() {
 
                     git(
                         branch: 'main',
-                        url: 'https://github.com/Megha-Malik/ansible-redis.git
+                        url: 'https://github.com/Megha-Malik/ansible-redis.git'
                     )
 
                     echo "Redis Ansible repository cloned successfully."
@@ -47,16 +48,17 @@ def call() {
                         env.ACTION_MESSAGE = config['ACTION_MESSAGE']
                         env.KEEP_APPROVAL_STAGE = config['KEEP_APPROVAL_STAGE']
 
-                        echo "Environment       : ${env.ENVIRONMENT}"
-                        echo "Code Base Path    : ${env.CODE_BASE_PATH}"
-                        echo "Slack Channel     : ${env.SLACK_CHANNEL_NAME}"
-                        echo "Approval Enabled  : ${env.KEEP_APPROVAL_STAGE}"
-                        echo "Action Message    : ${env.ACTION_MESSAGE}"
+                        echo "Environment      : ${env.ENVIRONMENT}"
+                        echo "Code Base Path   : ${env.CODE_BASE_PATH}"
+                        echo "Slack Channel    : ${env.SLACK_CHANNEL_NAME}"
+                        echo "Approval Enabled : ${env.KEEP_APPROVAL_STAGE}"
+                        echo "Action Message   : ${env.ACTION_MESSAGE}"
                     }
                 }
             }
 
             stage('User Approval') {
+
                 when {
                     expression {
                         return env.KEEP_APPROVAL_STAGE?.toBoolean()
@@ -91,11 +93,14 @@ def call() {
 
                         echo ""
                         echo "Checking Dynamic Inventory..."
-                        ansible-inventory -i aws_ec2.yml --graph
+                        ansible-inventory \
+                            -i aws_ec2.yml \
+                            --graph
 
                         echo ""
                         echo "Checking Redis target connectivity..."
-                        ansible env_prod \
+                        ansible \
+                            env_prod \
                             -i aws_ec2.yml \
                             -m ping
 
@@ -117,7 +122,7 @@ def call() {
             success {
 
                 echo "=========================================="
-                echo " Stage 4: Notification"
+                echo " Stage 4: Notification - SUCCESS"
                 echo "=========================================="
 
                 slackSend(
@@ -156,6 +161,10 @@ Status: FAILURE
 
             aborted {
 
+                echo "=========================================="
+                echo " Notification - ABORTED"
+                echo "=========================================="
+
                 slackSend(
                     channel: "#${env.SLACK_CHANNEL_NAME}",
                     color: "warning",
@@ -171,3 +180,5 @@ Status: ABORTED
         }
     }
 }
+
+
