@@ -100,7 +100,7 @@ def call() {
                         echo ""
                         echo "Checking Redis target connectivity..."
                         ansible \
-                            env_prod \
+                            all \
                             -i aws_ec2.yml \
                             -m ping
 
