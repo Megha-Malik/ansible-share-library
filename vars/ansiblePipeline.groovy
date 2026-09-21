@@ -9,7 +9,7 @@ def call() {
 
             stage('Clone') {
                 steps {
-                    cloneStage()
+                    CloneStage()
                 }
             }
 
